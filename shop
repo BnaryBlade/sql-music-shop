@@ -1,0 +1,54 @@
+-- Таблица "Исполнители"
+CREATE TABLE Исполнители (
+    id INT PRIMARY KEY,
+    Имя_исполнителя VARCHAR(255)
+);
+
+-- Таблица "Исполнители-жанры"
+CREATE TABLE Исполнитель_жанры (
+    id INT PRIMARY KEY,
+    id_исполнителя INT,
+    id_жанра INT
+);
+
+-- Таблица "Жанры"
+CREATE TABLE Жанры (
+    id INT PRIMARY KEY,
+    название_жанра VARCHAR(255)
+);
+
+-- Таблица "Альбомы"
+CREATE TABLE Альбомы (
+    id INT PRIMARY KEY,
+    название_альбома VARCHAR(255),
+    год_выпуска INT
+);
+
+-- Таблица "Альбомы-исполнители"
+CREATE TABLE Альбомы_исполнители (
+    id INT PRIMARY KEY,
+    id_исполнителя INT,
+    id_альбома INT
+);
+
+-- Таблица "Треки"
+CREATE TABLE Треки (
+    id INT PRIMARY KEY,
+    название_трека VARCHAR(255),
+    id_альбома INT,
+    Продолжительность VARCHAR(50)
+);
+
+-- Таблица "Сборник"
+CREATE TABLE Сборник (
+    id INT PRIMARY KEY,
+    название_сборника VARCHAR(255),
+    год_выпуска INT
+);
+
+-- Таблица "Сборники-треки"
+CREATE TABLE Сборники_треки (
+    id INT PRIMARY KEY,
+    id_трека INT,
+    id_сборника INT
+);
