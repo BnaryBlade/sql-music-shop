@@ -1,0 +1,146 @@
+-- Таблица "Исполнители"
+
+CREATE TABLE IF NOT EXISTS Исполнители (
+    id SERIAL PRIMARY KEY,
+    Имя_исполнителя VARCHAR(50) NOT NULL,
+    Рейтинг INT
+);
+
+-- Таблица "Жанры"
+
+CREATE TABLE IF NOT EXISTS Жанры (
+    id SERIAL PRIMARY KEY,
+    Название_жанра VARCHAR(50) NOT NULL
+);
+
+
+-- Таблица "Исполнители-жанры"
+
+CREATE TABLE IF NOT EXISTS Исполнитель_жанры (
+    id SERIAL PRIMARY KEY,
+    id_исполнителя INT,
+    id_жанра INT,
+    FOREIGN KEY (id_исполнителя) REFERENCES Исполнители(id),
+    FOREIGN KEY (id_жанра) REFERENCES Жанры(id)
+);
+
+
+-- Таблица "Альбомы"
+
+CREATE TABLE IF NOT EXISTS Альбомы (
+    id SERIAL PRIMARY KEY,
+    Название_альбома VARCHAR(100) NOT NULL,
+    id_исполнителя INT,
+    Год_выпуска INT,
+    FOREIGN KEY (id_исполнителя) REFERENCES Исполнители(id)
+);
+
+
+-- Таблица "Альбомы-исполнители"
+
+CREATE TABLE IF NOT EXISTS Альбомы_исполнители (
+    id SERIAL PRIMARY KEY,
+    id_альбома INT,
+    id_исполнителя INT,
+    FOREIGN KEY (id_альбома) REFERENCES Альбомы(id),
+    FOREIGN KEY (id_исполнителя) REFERENCES Исполнители(id)
+);
+
+
+-- Таблица "Треки"
+
+CREATE TABLE IF NOT EXISTS Треки (
+    id SERIAL PRIMARY KEY,
+    Название_трека VARCHAR(100) NOT NULL,
+    Продолжительность VARCHAR(10),
+    id_альбома INT,
+    FOREIGN KEY (id_альбома) REFERENCES Альбомы(id)
+);
+
+
+-- Таблица "Сборник"
+
+CREATE TABLE IF NOT EXISTS Сборник (
+    id SERIAL PRIMARY KEY,
+    Название VARCHAR(100) NOT NULL,
+    Год_выпуска INT
+);
+
+
+-- Таблица "Сборники-треки"
+
+CREATE TABLE IF NOT EXISTS Сборники_треки (
+    id SERIAL PRIMARY KEY,
+    id_сборника INT,
+    id_трека INT,
+    FOREIGN KEY (id_сборника) REFERENCES Сборник(id),
+    FOREIGN KEY (id_трека) REFERENCES Треки(id)
+);
+
+-- Добавляем исполнителей
+INSERT INTO Исполнители (id, Имя_исполнителя) VALUES 
+(1, 'Imagine Dragons'),
+(2, 'Adele'),
+(3, 'Ed Sheeran'),
+(4, 'Taylor Swift');
+
+-- Добавляем жанры
+INSERT INTO Жанры (id, Название_жанра) VALUES 
+(1, 'Pop'),
+(2, 'Rock'),
+(3, 'R&B');
+
+-- Добавляем альбомы
+INSERT INTO Альбомы (id, id_исполнителя, Название_альбома, Год_выпуска) VALUES
+(1, 1, 'Night Visions', '2012'),
+(2, 2, '21', '2011'),
+(3, 3, '÷', '2017');
+
+-- Добавляем треки
+INSERT INTO Треки (id, id_альбома, Название_трека, Продолжительность) VALUES
+(1, 1, 'Radioactive', '3:06'),
+(2, 1, 'It''s Time', '4:00'),
+(3, 2, 'Rolling in the Deep', '3:49'),
+(4, 2, 'Someone Like You', '4:45'),
+(5, 3, 'Shape of You', '3:53'),
+(6, 3, 'Perfect', '4:23');
+
+-- Добавляем сборники
+INSERT INTO Сборник (id, Название, Год_выпуска) VALUES
+(1, 'Best of the Year 2019', 2019),
+(2, 'Summer Hits 2020', 2020),
+(3, 'Love Songs Collection', 2018),
+(4, 'Greatest Hits', 2017);
+
+-- Добавляем связи между исполнителями и жанрами
+INSERT INTO Исполнитель_жанры (id, id_исполнителя, id_жанра) VALUES
+(1, 1, 2), -- Imagine Dragons (Rock)
+(2, 2, 1), -- Adele (Pop)
+(3, 3, 3), -- Ed Sheeran (R&B)
+(4, 4, 1); -- Taylor Swift (Pop)
+
+SELECT Жанры.Название_жанра, COUNT(Исполнитель_жанры.id) AS Количество_исполнителей
+FROM Жанры
+LEFT JOIN Исполнитель_жанры ON Жанры.id = Исполнитель_жанры.id_жанра
+GROUP BY Жанры.Название_жанра;
+
+SELECT COUNT(Треки.id) AS Количество_треков
+FROM Треки
+JOIN Альбомы ON Треки.id_альбома = Альбомы.id
+WHERE Альбомы.Год_выпуска = 2019 or  Альбомы.Год_выпуска = 2020;
+
+SELECT Альбомы.Название_альбома, AVG(TIME_TO_SEC(Треки.Продолжительность)) AS Средняя_продолжительность_треков
+FROM Треки
+JOIN Альбомы ON Треки.id_альбома = Альбомы.id
+GROUP BY Альбомы.Название_альбома;
+
+SELECT Исполнители.Имя_исполнителя
+FROM Исполнители
+LEFT JOIN Альбомы ON Исполнители.id = Альбомы.id_исполнителя
+WHERE YEAR(Альбомы.Дата_выпуска) <> 2020 OR Альбомы.Дата_выпуска IS NULL;
+
+SELECT DISTINCT Сборники.Название_сборника
+FROM Сборники
+JOIN Треки ON Сборники.id = Треки.id_сборника
+JOIN Исполнители ON Треки.id_исполнителя = Исполнители.id
+WHERE Исполнители.Имя_исполнителя = 'Imagine Dragons';
