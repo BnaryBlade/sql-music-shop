@@ -163,10 +163,22 @@ GROUP BY Альбомы.Название;
 SELECT Исполнители.Имя_исполнителя
 FROM Исполнители
 LEFT JOIN Альбомы ON Исполнители.id = Альбомы.id_исполнителя
-WHERE Альбомы.Год != 2020 OR Альбомы.Год IS NULL;
+WHERE Альбомы.год_выпуска NOT IN (Альбомы.год_выпуска = 2020);
 
-SELECT Сборник.Название
+CREATE TABLE IF NOT EXISTS Исполнения (
+    id_исполнителя INT,
+    id_трека INT,
+    PRIMARY KEY (id_исполнителя, id_трека),
+    FOREIGN KEY (id_исполнителя) REFERENCES Исполнители(id),
+    FOREIGN KEY (id_трека) REFERENCES Треки(id)
+);
+
+ALTER TABLE Треки
+DROP COLUMN id_исполнителя;
+
+SELECT DISTINCT Сборник.Название
 FROM Сборник
 JOIN Треки ON Сборник.id = Треки.id_сборника
-JOIN Исполнители ON Треки.id_исполнителя = Исполнители.id
+JOIN Исполнения ON Треки.id = Исполнения.id_трека
+JOIN Исполнители ON Исполнения.id_исполнителя = Исполнители.id
 WHERE Исполнители.Имя_исполнителя = 'Imagine Dragons';
